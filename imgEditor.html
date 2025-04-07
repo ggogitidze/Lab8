@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Editor</title>
+    <style>
+        *{
+            font-size: 14pt;
+            margin: 0.5em;
+        }
+        button{
+            padding: 1em;
+            padding-left: 4em;
+            padding-right: 4em;
+            color: #ccc;
+            background-color: #333;
+            border-radius: 5px;
+        }
+
+        button:hover{
+            background-color: green;
+        }
+
+        canvas{
+            border: solid 1px gray;
+        }
+    </style>
+</head>
+<body>
+    <button id="saveBtn">save</button>
+    <button id="loadBtn">Load</button>
+
+    <br>
+    <input type="text" id="fileName" placeholder="File Name">
+    <br>
+    <canvas id="imgCanvas" width="500" height="500">
+    
+</body>
+<script>
+    const saveBtn = document.getElementById('saveBtn');
+    const loadBtn = document.getElementById('loadBtn');
+    const fileName = document.getElementById('fileName');
+    const fileContent = document.getElementById('fileContent');
+    const canvas = document.getElementById('imgCanvas');
+    const ctx = canvas.getContext('2d');
+
+
+
+    loadBtn.addEventListener('click',()=>{
+
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = 'image/*';
+        fileInput.addEventListener('change',()=>{
+            var fr = new FileReader();
+            fr.onload=function(){
+                const img = new Image();
+                img.onload = function(){
+                    const ratio = img.width/img.height;
+                    canvas.width = 500;
+                    canvas.height = 500/ratio;
+                    ctx.drawImage(img, 0 , 0 , canvas.width, canvas.height);
+                }
+                img.src = fr.result;
+            }
+            
+            fr.readAsDataURL(fileInput.files[0]);
+            fileName.value = fileInput.value.split('\\').at(-1).split('/').at(-1);
+        });
+        fileInput.click();
+    });
+
+    saveBtn.addEventListener('click',async ()=>{
+        const downloadLink = document.createElement('a');
+        downloadLink.download = fileName.value;
+        downloadLink.href = canvas.toDataURL('image/png');
+        downloadLink.click();
+    });
+
+    let drawing = false;
+    let radius = 1;
+    canvas.addEventListener('mousedown',()=>{
+        drawing=true;
+        radius = 20+20*Math.random();
+        ctx.fillStyle = 
+            `rgba(${Math.random()*225},${Math.random()*225},${Math.random()*225},0.2)`;
+    })
+
+
+    canvas.addEventListener('mousemove',()=>{
+        if(drawing){
+            ctx.beginPath();
+            ctx.arc(e.offsetX, e.offsetY, drawing, 0, 2 * Math.PI);
+            ctx.fill();
+        }
+    })
+
+    
+    canvas.addEventListener('mouseup',()=>{
+        drawing = True;
+    })
+</script>
+</html>

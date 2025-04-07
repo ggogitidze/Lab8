@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Editor</title>
+    <style>
+        *{
+            font-size: 14pt;
+            margin: 0.5em;
+        }
+        button{
+            padding: 1em;
+            padding-left: 4em;
+            padding-right: 4em;
+            color: #ccc;
+            background-color: #333;
+            border-radius: 5px;
+        }
+
+        button:hover{
+            background-color: green;
+        }
+    </style>
+</head>
+<body>
+    <button id="saveBtn">save</button>
+    <button id="loadBtn">Load</button>
+
+    <br>
+    <input type="text" id="fileName" placeholder="File Name">
+    <br>
+    <textarea id="fileContent" cols=50 rows=20 placeholder="File Content"></textarea>
+    
+</body>
+<script>
+    const saveBtn = document.getElementById('saveBtn');
+    const loadBtn = document.getElementById('loadBtn');
+    const fileName = document.getElementById('fileName');
+    const fileContent = document.getElementById('fileContent');
+
+    loadBtn.addEventListener('click',()=>{
+
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = '*.txt, *.md';
+        fileInput.addEventListener('change',()=>{
+            var fr = new FileReader();
+            fr.onload=function(){
+                fileContent.value = fr.result;
+            }
+            fr.readAsText(fileInput.files[0]);
+            fileName.value = fileInput.value.split('\\').at(-1).split('/').at(-1);
+        });
+        fileInput.click();
+    });
+
+    saveBtn.addEventListener('click',async ()=>{
+        const handle = await showSaveFilePicker({
+            suggestedName: fileName.value
+        });
+        const stream = await handle.createWritable();
+        await stream.write(fileContent.value);
+        await stream.close();
+    });
+</script>
+</html>
